@@ -475,6 +475,33 @@ enum CompressionCodec {
   BROTLI = 4; // Added in 2.4
   LZ4 = 5;    // Added in 2.4
   ZSTD = 6;   // Added in 2.4
+  ZFP = 7; // Lossy floating-point compressor
+}
+
+/**
+ * Supported error modes for lossy floating-point compression.
+ */
+enum LossyFPCompressionCodecErrorMode {
+  ABSOLUTE_ERROR = 0;
+}
+
+/**
+ * Parameters for when ABSOLUTE_ERROR mode is selected.
+ *
+ * The absolute error for the true value and reconstructed value is
+ * computed as |true_value - reconstructed_value|. The absolute error
+ * is adhered to if the absolute difference is less than the specified
+ * error.
+ *
+ * The specified error has to be at least as big as machine epsilon for
+ * the used floating-point type.
+ */
+struct LossyFPCompressionCodecAbsoluteErrorParameter {
+  1: required double error;
+}
+
+union LossyFPCompressionCodecErrorParameter {
+  1: LossyFPCompressionCodecAbsoluteErrorParameter absoluteError
 }
 
 enum PageType {
@@ -727,6 +754,10 @@ struct ColumnMetaData {
 
   /** Byte offset from beginning of file to Bloom filter data. **/
   14: optional i64 bloom_filter_offset;
+
+  15: optional LossyFPCompressionCodecErrorMode lossy_fp_compression_codec_error_mode;
+
+  16: optional LossyFPCompressionCodecErrorParameter lossy_fp_compression_codec_error_parameter;
 }
 
 struct ColumnChunk {
